@@ -1,0 +1,47 @@
+name: GPT-4 PR Review
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  pr_review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run GPT-4 PR Review
+        id: pr_review
+        env:
+          GPT_4_API_KEY: ${{ secrets.GPT_4_API_KEY }}
+        run: |
+          python .github/actions/gpt4_pr_review.py
+
+      - name: Add PR review comment
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('gpt4_output.txt', 'utf8');
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              event: 'COMMENT',
+              body: output
+            });
