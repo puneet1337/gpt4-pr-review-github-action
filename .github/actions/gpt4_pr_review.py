@@ -1,5 +1,6 @@
 import os
 import sys
+
 import openai
 from github import Github
 
@@ -7,8 +8,6 @@ GITHUB_TOKEN = sys.argv[1]
 GPT_4_API_KEY = os.environ['GPT_4_API_KEY']
 GITHUB_REPOSITORY = sys.argv[2]
 GITHUB_PULL_REQUEST_NUMBER = sys.argv[3]
-
-openai.api_key = os.getenv(GPT_4_API_KEY)
 
 g = Github(GITHUB_TOKEN)
 repo = g.get_repo(GITHUB_REPOSITORY)
@@ -21,23 +20,24 @@ for file in files:
         code_snippets.append(file.patch)
 
 gpt_4_request_data = {
-    "api_key": GPT_4_API_KEY,
     "input": "\n\n".join(code_snippets)
 }
+try:
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "You are an expert software engineer & Github PR Review Bot. You are given Code "
+                                          "as input, you generate a clear & concise PR Review with actionables creator "
+                                          "can take."},
+            {"role": "user", "content": gpt_4_request_data["input"]}
+        ],
+        temperature=.5,
+    )
+    gpt_output = response["choices"][0]["message"]["content"].strip()
 
-response = openai.ChatCompletion.create(
-    model="gpt-4",
-    messages=[
-        {"role": "system", "content": "You are an expert software engineer & Github PR Review Bot. You are given Code "
-                                      "as input, you generate a clear & concise PR Review with actionables creator "
-                                      "can take."},
-        {"role": "user", "content": gpt_4_request_data["input"]}
-    ],
-    temperature=.5,
-)
+    with open("gpt4_output.txt", "w") as f:
+        f.write(gpt_output)
 
-response.raise_for_status()
-gpt_output = response.json()["choices"][0]["message"]["content"].strip()
+except Exception as e:
+    print("Received Error... {}".format(e))
 
-with open("gpt4_output.txt", "w") as f:
-    f.write(gpt_output)
