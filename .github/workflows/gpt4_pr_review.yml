@@ -29,7 +29,7 @@ jobs:
         env:
           GPT_4_API_KEY: ${{ secrets.GPT_4_API_KEY }}
         run: |
-          python .github/actions/gpt4_pr_review.py
+         python .github/actions/gpt4_pr_review.py ${{ secrets.GITHUB_TOKEN }} $GITHUB_REPOSITORY ${{ github.event.pull_request.number }}
 
       - name: Add PR review comment
         uses: actions/github-script@v5
