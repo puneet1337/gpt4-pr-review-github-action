@@ -22,7 +22,7 @@ jobs:
           python-version: 3.9
 
       - name: Install dependencies
-        run: pip install requests
+        run: pip install PyGithub openai
 
       - name: Run GPT-4 PR Review
         id: pr_review
