@@ -9,6 +9,7 @@ GPT_4_API_KEY = os.environ['GPT_4_API_KEY']
 GITHUB_REPOSITORY = sys.argv[2]
 GITHUB_PULL_REQUEST_NUMBER = sys.argv[3]
 
+openai.api_key = GPT_4_API_KEY
 g = Github(GITHUB_TOKEN)
 repo = g.get_repo(GITHUB_REPOSITORY)
 pr = repo.get_pull(int(GITHUB_PULL_REQUEST_NUMBER))
@@ -22,6 +23,7 @@ for file in files:
 gpt_4_request_data = {
     "input": "\n\n".join(code_snippets)
 }
+
 try:
     response = openai.ChatCompletion.create(
         model="gpt-4",
@@ -40,4 +42,3 @@ try:
 
 except Exception as e:
     print("Received Error... {}".format(e))
-
