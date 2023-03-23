@@ -1,12 +1,12 @@
 import os
-
+import sys
 import openai
 from github import Github
 
-GITHUB_TOKEN = os.environ['GITHUB_TOKEN']
+GITHUB_TOKEN = sys.argv[1]
 GPT_4_API_KEY = os.environ['OPENAI_API_KEY']
-GITHUB_REPOSITORY = os.environ['GITHUB_REPOSITORY']
-GITHUB_PULL_REQUEST_NUMBER = os.environ['GITHUB_PULL_REQUEST_NUMBER']
+GITHUB_REPOSITORY = sys.argv[2]
+GITHUB_PULL_REQUEST_NUMBER = sys.argv[3]
 
 openai.api_key = os.getenv(GPT_4_API_KEY)
 
