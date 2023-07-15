@@ -1,5 +1,7 @@
 name: GPT-4 PR Review
 description: A PR Review Bot Powered By OpenAI GPT-4
+icon: aperture
+color: orange
 
 on:
   pull_request:
