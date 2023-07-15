@@ -1,7 +1,25 @@
 name: GPT-4 PR Review
 description: A PR Review Bot Powered By OpenAI GPT-4
-Icon: aperture
-Color: orange
+
+inputs:
+  repository:
+    description: "The target repository"
+    required: true
+  github_token:
+    description: "GitHub Token"
+    required: true
+  GPT_4_API_KEY:
+    description: "Your GPT-4 API key"
+    required: true
+  sha:
+    description: "Github SHA"
+    required: true
+  pat:
+    description: "Github PAT"
+    required: true
+  pull_request:
+    description: "Github pull_request"
+    required: true
 
 on:
   pull_request:
@@ -16,7 +34,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ inputs.sha }}
           fetch-depth: 0
 
       - name: Setup Python
@@ -30,14 +48,14 @@ jobs:
       - name: Run GPT-4 PR Review
         id: pr_review
         env:
-          GPT_4_API_KEY: ${{ secrets.GPT_4_API_KEY }}
+          GPT_4_API_KEY: ${{ inputs.GPT_4_API_KEY }}
         run: |
-         python .github/actions/gpt4_pr_review.py ${{ secrets.PAT }} $GITHUB_REPOSITORY ${{ github.event.pull_request.number }}
+          python .github/actions/gpt4_pr_review.py ${{ inputs.pat }} ${{ inputs.repository }} ${{ inputs.pull_request }}
 
       - name: Add PR review comment
         uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ inputs.github_token }}
           script: |
             const fs = require('fs');
             const output = fs.readFileSync('gpt4_output.txt', 'utf8');
